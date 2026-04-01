@@ -118,3 +118,21 @@ jobs:
       with:
         name: helm-package
         path: ./*.tgz
+      
+  deploy-development:
+    needs: [docker-ci, helm-ci]
+    if: github.ref_name == 'main'
+    uses: ./.github/workflows/reusable.yml
+    with:
+      environment: development
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  deploy-staging:
+    needs: [deploy-development]
+    if: github.ref_name == 'main'
+    uses: ./.github/workflows/reusable.yml
+    with:
+      environment: staging
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
